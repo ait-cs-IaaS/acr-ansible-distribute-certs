@@ -1,32 +1,33 @@
 ---
 - name: Find all cert files
   ansible.builtin.find:
-      paths: '{{ cert_src_path }}/'
-      patterns: '*.crt'
-      recurse: true
+    paths: '{{ cert_src_path }}/'
+    patterns: '*.crt'
+    recurse: true
   delegate_to: localhost
   register: cert_files
 
 - name: Deploy cert files
   become: true
   ansible.builtin.copy:
-      src: '{{ item.path }}'
-      dest: /etc/ssl/{{ item.path | basename }}
-      mode: '0644'
+    src: '{{ item.path }}'
+    dest: /etc/ssl/{{ item.path | basename }}
+    mode: '0644'
   loop: '{{ cert_files.files }}'
+  notify: Reboot machine
 
 - name: Find all key files
   ansible.builtin.find:
-      paths: '{{ cert_src_path }}/'
-      patterns: '*.key'
-      recurse: true
+    paths: '{{ cert_src_path }}/'
+    patterns: '*.key'
+    recurse: true
   delegate_to: localhost
   register: key_files
 
 - name: Deploy key files
   become: true
   ansible.builtin.copy:
-      src: '{{ item.path }}'
-      dest: /etc/ssl/{{ item.path | basename }}
-      mode: '0600'
+    src: '{{ item.path }}'
+    dest: /etc/ssl/{{ item.path | basename }}
+    mode: '0600'
   loop: '{{ key_files.files }}'
