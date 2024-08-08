@@ -10,10 +10,13 @@
 - name: Deploy cert files
   become: true
   ansible.builtin.copy:
-    src: '{{ item.path }}'
-    dest: /etc/ssl/{{ item.path | basename }}
+    src: '{{ cert_file.path }}'
+    dest: /etc/ssl/{{ cert_file.path | basename }}
     mode: '0644'
   loop: '{{ cert_files.files }}'
+  loop_control:
+    loop_var: cert_file
+    label: '{{ cert_file.path | basename }}'
   notify: Reboot machine
 
 - name: Find all key files
@@ -27,7 +30,10 @@
 - name: Deploy key files
   become: true
   ansible.builtin.copy:
-    src: '{{ item.path }}'
-    dest: /etc/ssl/{{ item.path | basename }}
+    src: '{{ key_file.path }}'
+    dest: /etc/ssl/{{ key_file.path | basename }}
     mode: '0600'
   loop: '{{ key_files.files }}'
+  loop_control:
+    loop_var: key_file
+    label: '{{ key_file.path | basename }}'
